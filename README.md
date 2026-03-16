@@ -1,98 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+﻿# AdotaPet - API Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![NestJS](https://img.shields.io/badge/NestJS-11.x-E0234E?logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Backend oficial do **AdotaPet**, uma solução digital para adoção consciente de animais.
 
-## Description
+Projeto acadêmico da disciplina de construção de produtos digitais (**S204 / INATEL**).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Visão Geral
 
-## Project setup
+O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoção responsável, oferecendo uma base tecnológica para conectar pessoas, ONGs/abrigos e demandas de proteção animal.
 
-```bash
-$ npm install
-```
+## Stack Tecnológico
 
-## Compile and run the project
+- **NestJS** (framework backend)
+- **TypeScript** (tipagem forte e organização)
+- **Prisma ORM** (acesso seguro ao banco)
+- **MySQL** (banco de dados relacional)
+- **Docker** (provisionamento local do banco)
 
-```bash
-# development
-$ npm run start
+## Status Atual do Desenvolvimento
 
-# watch mode
-$ npm run start:dev
+- Setup inicial do backend concluído
+- Prisma configurado e conectado ao MySQL
+- Modelagem relacional inicial implementada com entidades principais:
+  - Usuários
+  - ONGs/Abrigos
+  - Pets
+  - Solicitações de Adoção
+  - Denúncias
+  - Pedidos de Resgate
+  - Termos de Responsabilidade
 
-# production mode
-$ npm run start:prod
-```
+## Getting Started
 
-## Run tests
+### 1. Pré-requisitos
 
-```bash
-# unit tests
-$ npm run test
+Antes de começar, garanta que você tenha instalado:
 
-# e2e tests
-$ npm run test:e2e
+- **Node.js** (LTS recomendado)
+- **Docker**
 
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 2. Clone o repositório e instale dependências
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+git clone <URL_DO_REPOSITORIO>
+cd adotapet-backend
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 3. Configure variáveis de ambiente
 
-## Resources
+Copie o arquivo de exemplo e ajuste os valores, se necessário:
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+cp .env.example .env
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+No Windows PowerShell:
 
-## Support
+```bash
+Copy-Item .env.example .env
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 4. Suba o banco MySQL via Docker
 
-## Stay in touch
+Use o comando abaixo exatamente como definido no projeto:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+docker run --name adotapet-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=adotapet -p 3306:3306 -d mysql:8.0
+```
 
-## License
+### 5. Execute as migrações do Prisma
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Com o banco em execução e `.env` configurado:
+
+```bash
+npx prisma migrate dev
+```
+
+### 6. Inicie o servidor em desenvolvimento
+
+```bash
+npm run start:dev
+```
+
+A API estará disponível em `http://localhost:3000`.
+
+## Scripts Úteis
+
+```bash
+npm run build
+npm run lint
+npm run test
+npx prisma generate
+npx prisma studio
+```
+
+## Organização da Equipe
+
+- Backend: Roger e Rodrigo
+- Gestão de tarefas: Trello (Sprints)
+
+## Licença
+
+Projeto acadêmico para fins educacionais.
