@@ -11,3 +11,216 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  ADOPTER
+  VOLUNTEER
+  ONG_ADMIN
+  ADMIN
+}
+
+enum Species {
+  DOG
+  CAT
+  OTHER
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum PetSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum PetStatus {
+  AVAILABLE
+  PENDING_ADOPTION
+  ADOPTED
+  IN_TREATMENT
+}
+
+enum AdoptionRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+}
+
+enum RescueHelpRequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CANCELED
+}
+
+enum ReportTargetType {
+  USER
+  PET
+  ORGANIZATION
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      UserRole @default(ADOPTER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  petsRegistered     Pet[]
+  adoptionRequests   AdoptionRequest[]
+  rescueHelpRequests RescueHelpRequest[]
+  reportsOpened      Report[]                      @relation("ReportsOpened")
+  reportsAgainst     Report[]                      @relation("ReportsAgainstUser")
+  termSignatures     ResponsibilityTermSignature[]
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  legalName   String
+  tradeName   String?
+  email       String   @unique
+  phone       String?
+  cnpj        String?  @unique
+  description String?
+  city        String?
+  state       String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pets           Pet[]
+  reportsAgainst Report[] @relation("ReportsAgainstOrganization")
+}
+
+model Pet {
+  id                  String    @id @default(cuid())
+  name                String
+  species             Species
+  breed               String?
+  sex                 Sex
+  ageInMonths         Int?
+  size                PetSize?
+  color               String?
+  vaccinated          Boolean   @default(false)
+  neutered            Boolean   @default(false)
+  specialNeeds        Boolean   @default(false)
+  specialNeedsDetails String?
+  description         String?
+  status              PetStatus @default(AVAILABLE)
+  city                String?
+  state               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  registeredById String
+  registeredBy   User   @relation(fields: [registeredById], references: [id])
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  adoptionRequests   AdoptionRequest[]
+  reports            Report[]
+  termSignatures     ResponsibilityTermSignature[]
+  rescueHelpRequests RescueHelpRequest[]
+}
+
+model AdoptionRequest {
+  id         String                @id @default(cuid())
+  message    String?
+  status     AdoptionRequestStatus @default(PENDING)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  reviewedAt DateTime?
+
+  petId String
+  pet   Pet    @relation(fields: [petId], references: [id])
+
+  requesterId String
+  requester   User   @relation(fields: [requesterId], references: [id])
+
+  termSignatures ResponsibilityTermSignature[]
+
+  @@index([petId, status])
+  @@index([requesterId, status])
+}
+
+model RescueHelpRequest {
+  id          String                  @id @default(cuid())
+  title       String
+  description String
+  address     String?
+  city        String?
+  state       String?
+  latitude    Decimal?                @db.Decimal(10, 7)
+  longitude   Decimal?                @db.Decimal(10, 7)
+  status      RescueHelpRequestStatus @default(OPEN)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  requestedById String
+  requestedBy   User   @relation(fields: [requestedById], references: [id])
+
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
+  @@index([status, createdAt])
+}
+
+model Report {
+  id          String           @id @default(cuid())
+  targetType  ReportTargetType
+  description String
+  status      ReportStatus     @default(OPEN)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  reportedById String
+  reportedBy   User   @relation("ReportsOpened", fields: [reportedById], references: [id])
+
+  targetUserId String?
+  targetUser   User?   @relation("ReportsAgainstUser", fields: [targetUserId], references: [id])
+
+  targetPetId String?
+  targetPet   Pet?    @relation(fields: [targetPetId], references: [id])
+
+  targetOrganizationId String?
+  targetOrganization   Organization? @relation("ReportsAgainstOrganization", fields: [targetOrganizationId], references: [id])
+
+  @@index([status, createdAt])
+}
+
+model ResponsibilityTermSignature {
+  id              String   @id @default(cuid())
+  acceptedAt      DateTime @default(now())
+  termVersion     String
+  signerIp        String?
+  signerUserAgent String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  petId String
+  pet   Pet    @relation(fields: [petId], references: [id])
+
+  adoptionRequestId String?
+  adoptionRequest   AdoptionRequest? @relation(fields: [adoptionRequestId], references: [id])
+
+  @@index([userId, acceptedAt])
+  @@index([petId, acceptedAt])
+}
