@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PetSize, PetStatus, Prisma, Sex, Species } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePetDto } from './dto/create-pet.dto';
@@ -21,9 +26,12 @@ type FindPetsFilters = {
 export class PetsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createPetDto: CreatePetDto) {
+  create(createPetDto: CreatePetDto, userId: string) {
     return this.prisma.pet.create({
-      data: createPetDto,
+      data: {
+        ...createPetDto,
+        registeredById: userId,
+      },
     });
   }
 
@@ -82,8 +90,12 @@ export class PetsService {
     return pet;
   }
 
-  async update(id: string, updatePetDto: UpdatePetDto) {
-    await this.ensurePetExists(id);
+  async update(id: string, updatePetDto: UpdatePetDto, userId: string) {
+    const pet = await this.ensurePetExists(id);
+
+    if (pet.registeredById !== userId) {
+      throw new ForbiddenException('Você não tem permissão para alterar este pet.');
+    }
 
     return this.prisma.pet.update({
       where: { id },
@@ -91,8 +103,12 @@ export class PetsService {
     });
   }
 
-  async remove(id: string) {
-    await this.ensurePetExists(id);
+  async remove(id: string, userId: string) {
+    const pet = await this.ensurePetExists(id);
+
+    if (pet.registeredById !== userId) {
+      throw new ForbiddenException('Você não tem permissão para alterar este pet.');
+    }
 
     return this.prisma.pet.delete({
       where: { id },
@@ -100,14 +116,19 @@ export class PetsService {
   }
 
   private async ensurePetExists(id: string) {
-    const exists = await this.prisma.pet.findUnique({
+    const pet = await this.prisma.pet.findUnique({
       where: { id },
-      select: { id: true },
+      select: {
+        id: true,
+        registeredById: true,
+      },
     });
 
-    if (!exists) {
+    if (!pet) {
       throw new NotFoundException(`Pet with id "${id}" was not found.`);
     }
+
+    return pet;
   }
 
   private parseEnum<T extends Record<string, string>>(
