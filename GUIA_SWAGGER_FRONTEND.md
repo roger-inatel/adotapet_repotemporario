@@ -79,13 +79,18 @@ Exemplos de rotas que exigem token:
 
 Se o token estiver ausente ou inválido, a API retorna `401 Unauthorized`.
 
-## 5. Regras importantes para o Front
+## 5. Novidades (Upload e RBAC)
+
+- **Upload de Foto:** A rota `POST /pets/{id}/photo` usa `multipart/form-data`. O Swagger exibirá um botão **Choose File**. O backend processa e devolve a URL.
+- **Papéis (Roles):** Atenção ao tipo de usuário logado. Um `ADOPTER` não pode deletar ONGs. Apenas um `ADOPTER` pode assinar o termo de adoção final. O backend barra com `403 Forbidden` se o papel estiver errado.
+
+## 6. Regras importantes para o Front
 
 - Não envie `registeredById` ao criar pet; o backend define pelo usuário autenticado.
 - Recursos com ownership só podem ser alterados pelo dono (`403 Forbidden` se não for dono).
 - Campos enum devem respeitar exatamente os valores documentados no Swagger.
 
-## 6. Checklist de integração local
+## 7. Checklist de integração local
 
 1. Backend rodando (`npm run start:dev`)
 2. Banco MySQL ativo no Docker
@@ -93,7 +98,7 @@ Se o token estiver ausente ou inválido, a API retorna `401 Unauthorized`.
 4. Token JWT configurado no Swagger (Authorize)
 5. Teste manual da rota no Swagger antes de integrar no Front
 
-## 7. Erros comuns
+## 8. Erros comuns
 
 - **Cannot GET /docs**: backend não está na branch correta ou Swagger não foi configurado.
 - **401 Unauthorized**: token ausente/expirado/formato incorreto.

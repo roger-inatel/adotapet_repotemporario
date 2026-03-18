@@ -21,18 +21,19 @@ Nossa API não retorna erros crus de banco para o Frontend. Temos camadas de pro
 - **Como funciona:** Methods como `ensurePetExists`/`ensureOrganizationExists` validam existência antes de alterar.
 - **O que o Front recebe:** `NotFoundException` com mensagem clara.
 
-### D) Autorização por Ownership (HTTP 403)
+### D) Autorização por Ownership e RBAC (HTTP 403)
 - **Onde acontece:** Módulo de Pets e rotas protegidas por JWT.
 - **Como funciona:** `JwtAuthGuard` + `CurrentUser` extraem usuário logado e validam dono do recurso.
+- **RBAC:** O `RolesGuard` + `@Roles()` garante que apenas o papel correto (ex: ADOPTER para assinar termo, ADMIN para apagar ONG) acesse a rota.
 - **O que o Front recebe:** `ForbiddenException` quando tentar alterar recurso de outro usuário.
 
 ## 2. Estado Atual por Módulo
 
 1. **Users:** CRUD base + proteção para não retornar senha.
 2. **Auth:** Login JWT + hash de senha com bcrypt.
-3. **Pets:** CRUD com filtros, guard e ownership.
-4. **Organizations:** CRUD base com validações de e-mail, CNPJ e telefone.
-5. **Adoptions:** Fluxo de solicitação com regras de negócio e transação Prisma na aprovação.
+3. **Pets:** CRUD com filtros, guard, ownership e upload estático de fotos.
+4. **Organizations:** CRUD base com validações de e-mail, CNPJ e telefone, protegido por Roles.
+5. **Adoptions + Responsibility Terms:** Fluxo de solicitação com regras de negócio, transação Prisma na aprovação e Assinatura Digital de Termo de Responsabilidade (captura de IP/User-Agent).
 
 ## 3. Próximos Passos
 

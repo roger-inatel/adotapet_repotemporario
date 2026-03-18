@@ -24,22 +24,13 @@ O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoç�
 
 ## Status Atual do Desenvolvimento
 
-- Setup inicial do backend concluído
-- Prisma configurado e conectado ao MySQL
-- Modelagem relacional inicial implementada com entidades principais:
-  - Usuários
-  - ONGs/Abrigos
-  - Pets
-  - Solicitações de Adoção
-  - Denúncias
-  - Pedidos de Resgate
-  - Termos de Responsabilidade
-- Módulos implementados e ativos:
-  - Users
-  - Auth (JWT + bcrypt)
-  - Pets (com ownership e guards)
-  - Organizations
-  - Adoptions
+- ✅ Setup inicial do backend concluído.
+- ✅ Prisma configurado e conectado ao MySQL via Docker.
+- ✅ Módulos Base: Pets, Usuários e ONGs implementados.
+- ✅ Segurança Avançada: Login (JWT + Bcrypt) e RBAC (Controle de Acesso por Papéis: ADMIN, NGO_ADMIN, ADOPTER).
+- ✅ Upload de Arquivos: Imagens de Pets via Multer (preparado para Docker Volumes).
+- ✅ Adoções & Termos: Fluxo completo de match, transações de aprovação e assinatura digital com rastro de auditoria (IP/User-Agent).
+- ⏳ Próximos passos: Sistema de Denúncias e Resgates (Upload de mídia e geolocalização).
 
 ## Getting Started
 
