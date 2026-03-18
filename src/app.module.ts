@@ -6,9 +6,17 @@ import { PetsModule } from './modules/pets/pets.module';
 import { UsersModule } from './modules/users/users.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AdoptionsModule } from './modules/adoptions/adoptions.module';
 
 @Module({
-  imports: [PrismaModule, PetsModule, UsersModule, OrganizationsModule, AuthModule],
+  imports: [
+    PrismaModule,
+    PetsModule,
+    UsersModule,
+    OrganizationsModule,
+    AuthModule,
+    AdoptionsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
