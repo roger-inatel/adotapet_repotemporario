@@ -7,6 +7,7 @@ import { UsersModule } from './modules/users/users.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdoptionsModule } from './modules/adoptions/adoptions.module';
+import { ResponsibilityTermsModule } from './modules/responsibility-terms/responsibility-terms.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AdoptionsModule } from './modules/adoptions/adoptions.module';
     OrganizationsModule,
     AuthModule,
     AdoptionsModule,
+    ResponsibilityTermsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

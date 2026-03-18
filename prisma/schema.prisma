@@ -155,10 +155,21 @@ model AdoptionRequest {
   requesterId String
   requester   User   @relation(fields: [requesterId], references: [id])
 
+  responsibilityTerm ResponsibilityTerm?
   termSignatures ResponsibilityTermSignature[]
 
   @@index([petId, status])
   @@index([requesterId, status])
+}
+
+model ResponsibilityTerm {
+  id                String   @id @default(cuid())
+  adoptionRequestId String   @unique
+  adopterIp         String
+  userAgent         String
+  acceptedAt        DateTime @default(now())
+
+  adoptionRequest AdoptionRequest @relation(fields: [adoptionRequestId], references: [id])
 }
 
 model RescueHelpRequest {
