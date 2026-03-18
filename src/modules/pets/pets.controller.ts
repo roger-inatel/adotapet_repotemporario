@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { PetsService } from './pets.service';
@@ -31,8 +32,8 @@ export class PetsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new pet' })
-  create(@Body() createPetDto: CreatePetDto) {
-    return this.petsService.create(createPetDto);
+  create(@Body() createPetDto: CreatePetDto, @CurrentUser() user: any) {
+    return this.petsService.create(createPetDto, user.id);
   }
 
   @Get()
@@ -85,8 +86,12 @@ export class PetsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update pet by id' })
   @ApiParam({ name: 'id', description: 'Pet cuid id' })
-  update(@Param('id') id: string, @Body() updatePetDto: UpdatePetDto) {
-    return this.petsService.update(id, updatePetDto);
+  update(
+    @Param('id') id: string,
+    @Body() updatePetDto: UpdatePetDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.petsService.update(id, updatePetDto, user.id);
   }
 
   @Delete(':id')
@@ -94,7 +99,7 @@ export class PetsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete pet by id' })
   @ApiParam({ name: 'id', description: 'Pet cuid id' })
-  remove(@Param('id') id: string) {
-    return this.petsService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.petsService.remove(id, user.id);
   }
 }

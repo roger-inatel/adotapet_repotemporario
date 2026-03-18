@@ -124,10 +124,7 @@ export class CreatePetDto {
   @MaxLength(2)
   state?: string;
 
-  @ApiProperty({ example: 'cm8xyz1230000abcd1234efgh' })
-  @Transform(trimString)
-  @IsString()
-  registeredById: string;
+  registeredById?: string;
 
   @ApiPropertyOptional({ example: 'cm8org1230000abcd1234ijkl' })
   @IsOptional()
