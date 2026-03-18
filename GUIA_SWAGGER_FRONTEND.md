@@ -1,6 +1,6 @@
-# Guia R·pido de Swagger para o Frontend (AdotaPet)
+Ôªø# Guia R√°pido de Swagger para o Frontend (AdotaPet)
 
-Este guia È para Lucas e Lilyan conseguirem testar a API local e integrar o Front sem travar.
+Este guia √© para Lucas e Lilyan conseguirem testar a API local e integrar o Front.
 
 ## 1. Onde acessar
 
@@ -8,24 +8,24 @@ Com o backend rodando (`npm run start:dev`), abra:
 
 - `http://localhost:3000/docs`
 
-> `http://localhost:3000` mostra apenas a resposta b·sica da API. A documentaÁ„o real est· em `/docs`.
+> `http://localhost:3000` mostra apenas a resposta b√°sica da API. A documenta√ß√£o real est√° em `/docs`.
 
 ## 2. Como ler o Swagger
 
-Cada seÁ„o (Users, Auth, Pets, Organizations, Adoptions) contÈm:
+Cada se√ß√£o (Users, Auth, Pets, Organizations, Adoptions) cont√©m:
 
 - Endpoint
 - Payload esperado
-- Campos obrigatÛrios/opcionais
+- Campos obrigat√≥rios/opcionais
 - Exemplo de resposta
 
 Use sempre **Try it out** para testar localmente.
 
-## 3. Fluxo mÌnimo para autenticar
+## 3. Fluxo m√≠nimo para autenticar
 
-### Passo 1: Criar usu·rio
+### Passo 1: Criar usu√°rio
 
-- SeÁ„o `Users`
+- Se√ß√£o `Users`
 - Endpoint `POST /users`
 
 Exemplo:
@@ -41,7 +41,7 @@ Exemplo:
 
 ### Passo 2: Fazer login
 
-- SeÁ„o `Auth`
+- Se√ß√£o `Auth`
 - Endpoint `POST /auth/login`
 
 Exemplo:
@@ -57,7 +57,7 @@ Copie o `access_token` retornado.
 
 ### Passo 3: Autorizar no Swagger
 
-- Clique em **Authorize** (topo da p·gina)
+- Clique em **Authorize** (topo da p√°gina)
 - Cole:
 
 ```text
@@ -77,25 +77,25 @@ Exemplos de rotas que exigem token:
 - `DELETE /pets/{id}`
 - Rotas de `Adoptions`
 
-Se o token estiver ausente ou inv·lido, a API retorna `401 Unauthorized`.
+Se o token estiver ausente ou inv√°lido, a API retorna `401 Unauthorized`.
 
 ## 5. Regras importantes para o Front
 
-- N„o envie `registeredById` ao criar pet; o backend define pelo usu·rio autenticado.
-- Recursos com ownership sÛ podem ser alterados pelo dono (`403 Forbidden` se n„o for dono).
+- N√£o envie `registeredById` ao criar pet; o backend define pelo usu√°rio autenticado.
+- Recursos com ownership s√≥ podem ser alterados pelo dono (`403 Forbidden` se n√£o for dono).
 - Campos enum devem respeitar exatamente os valores documentados no Swagger.
 
-## 6. Checklist de integraÁ„o local
+## 6. Checklist de integra√ß√£o local
 
 1. Backend rodando (`npm run start:dev`)
 2. Banco MySQL ativo no Docker
-3. MigraÁıes aplicadas (`npx prisma migrate dev`)
+3. Migra√ß√µes aplicadas (`npx prisma migrate dev`)
 4. Token JWT configurado no Swagger (Authorize)
 5. Teste manual da rota no Swagger antes de integrar no Front
 
 ## 7. Erros comuns
 
-- **Cannot GET /docs**: backend n„o est· na branch correta ou Swagger n„o foi configurado.
+- **Cannot GET /docs**: backend n√£o est√° na branch correta ou Swagger n√£o foi configurado.
 - **401 Unauthorized**: token ausente/expirado/formato incorreto.
-- **403 Forbidden**: usu·rio logado n„o È dono do recurso.
-- **400 Bad Request**: payload inv·lido para os DTOs.
+- **403 Forbidden**: usu√°rio logado n√£o √© dono do recurso.
+- **400 Bad Request**: payload inv√°lido para os DTOs.

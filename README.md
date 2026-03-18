@@ -1,4 +1,4 @@
-# AdotaPet - API Backend
+ï»¿# AdotaPet - API Backend
 
 ![NestJS](https://img.shields.io/badge/NestJS-11.x-E0234E?logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
@@ -6,35 +6,35 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)
 
-Backend oficial do **AdotaPet**, uma solução digital para adoção consciente de animais.
+Backend oficial do **AdotaPet**, uma soluÃ§Ã£o digital para adoÃ§Ã£o consciente de animais.
 
-Projeto acadêmico da disciplina de construção de produtos digitais (**S204 / INATEL**).
+Projeto acadÃªmico da disciplina de construÃ§Ã£o de produtos digitais (**S204 / INATEL**).
 
-## Visão Geral
+## VisÃ£o Geral
 
-O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoção responsável, oferecendo uma base tecnológica para conectar pessoas, ONGs/abrigos e demandas de proteção animal.
+O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoÃ§Ã£o responsÃ¡vel, oferecendo uma base tecnolÃ³gica para conectar pessoas, ONGs/abrigos e demandas de proteÃ§Ã£o animal.
 
-## Stack Tecnológico
+## Stack TecnolÃ³gico
 
 - **NestJS** (framework backend)
-- **TypeScript** (tipagem forte e organização)
+- **TypeScript** (tipagem forte e organizaÃ§Ã£o)
 - **Prisma ORM** (acesso seguro ao banco)
 - **MySQL** (banco de dados relacional)
 - **Docker** (provisionamento local do banco)
 
 ## Status Atual do Desenvolvimento
 
-- Setup inicial do backend concluído
+- Setup inicial do backend concluÃ­do
 - Prisma configurado e conectado ao MySQL
 - Modelagem relacional inicial implementada com entidades principais:
-  - Usuários
+  - UsuÃ¡rios
   - ONGs/Abrigos
   - Pets
-  - Solicitações de Adoção
-  - Denúncias
+  - SolicitaÃ§Ãµes de AdoÃ§Ã£o
+  - DenÃºncias
   - Pedidos de Resgate
   - Termos de Responsabilidade
-- Módulos implementados e ativos:
+- MÃ³dulos implementados e ativos:
   - Users
   - Auth (JWT + bcrypt)
   - Pets (com ownership e guards)
@@ -43,14 +43,14 @@ O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoção
 
 ## Getting Started
 
-### 1. Pré-requisitos
+### 1. PrÃ©-requisitos
 
-Antes de começar, garanta que você tenha instalado:
+Antes de comeÃ§ar, garanta que vocÃª tenha instalado:
 
 - **Node.js** (LTS recomendado)
 - **Docker**
 
-### 2. Clone o repositório e instale dependências
+### 2. Clone o repositÃ³rio e instale dependÃªncias
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
@@ -58,9 +58,9 @@ cd adotapet-backend
 npm install
 ```
 
-### 3. Configure variáveis de ambiente
+### 3. Configure variÃ¡veis de ambiente
 
-Copie o arquivo de exemplo e ajuste os valores, se necessário:
+Copie o arquivo de exemplo e ajuste os valores, se necessÃ¡rio:
 
 ```bash
 cp .env.example .env
@@ -80,9 +80,9 @@ Use o comando abaixo exatamente como definido no projeto:
 docker run --name adotapet-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=adotapet -p 3306:3306 -d mysql:8.0
 ```
 
-### 5. Execute as migrações do Prisma
+### 5. Execute as migraÃ§Ãµes do Prisma
 
-Com o banco em execução e `.env` configurado:
+Com o banco em execuÃ§Ã£o e `.env` configurado:
 
 ```bash
 npx prisma migrate dev
@@ -94,21 +94,21 @@ npx prisma migrate dev
 npm run start:dev
 ```
 
-A API estará disponível em `http://localhost:3000`.
+A API estarÃ¡ disponÃ­vel em `http://localhost:3000`.
 
-Se você abrir `http://localhost:3000`, verá apenas uma resposta de prova de vida da aplicação.
+Se vocÃª abrir `http://localhost:3000`, verÃ¡ apenas uma resposta de prova de vida da aplicaÃ§Ã£o.
 
 ## ?? Como usar a API (Frontend + Swagger)
 
-A documentação interativa da API fica em:
+A documentaÃ§Ã£o interativa da API fica em:
 
 ?? `http://localhost:3000/docs`
 
-É no Swagger que Frontend e Backend alinham contrato de payloads, respostas e autenticação.
+Ã‰ no Swagger que Frontend e Backend alinham contrato de payloads, respostas e autenticaÃ§Ã£o.
 
 ### Fluxo recomendado para o Front testar rotas protegidas
 
-1. Criar usuário em `Users -> POST /users`
+1. Criar usuÃ¡rio em `Users -> POST /users`
 2. Fazer login em `Auth -> POST /auth/login`
 3. Copiar o `access_token` retornado
 4. Clicar em **Authorize** no topo do Swagger
@@ -118,11 +118,11 @@ A documentação interativa da API fica em:
 
 ### Importante
 
-- O backend identifica o usuário pelo token JWT.
-- Em rotas com ownership, o usuário só pode alterar os próprios recursos.
-- O Frontend **não precisa enviar `registeredById`** ao criar pet; esse campo é preenchido no backend.
+- O backend identifica o usuÃ¡rio pelo token JWT.
+- Em rotas com ownership, o usuÃ¡rio sÃ³ pode alterar os prÃ³prios recursos.
+- O Frontend **nÃ£o precisa enviar `registeredById`** ao criar pet; esse campo Ã© preenchido no backend.
 
-## Scripts Úteis
+## Scripts Ãšteis
 
 ```bash
 npm run build
@@ -133,13 +133,13 @@ npx prisma generate
 npx prisma studio
 ```
 
-## Organização da Equipe
+## OrganizaÃ§Ã£o da Equipe
 
 - Backend: Roger e Rodrigo
 - Frontend: Lucas e Lilyan
 - DevOps: Breno
-- Gestão de tarefas: Trello (Sprints)
+- GestÃ£o de tarefas: Trello (Sprints)
 
-## Licença
+## LicenÃ§a
 
-Projeto acadêmico para fins educacionais.
+Projeto acadÃªmico para fins educacionais.
