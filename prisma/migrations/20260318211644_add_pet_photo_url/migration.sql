@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Pet` ADD COLUMN `photoUrl` VARCHAR(191) NULL;

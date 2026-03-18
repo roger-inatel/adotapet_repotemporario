@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,21 +8,28 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PetSize, PetStatus, Sex, Species } from '@prisma/client';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { PetsService } from './pets.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Pets')
 @Controller('pets')
@@ -34,6 +42,46 @@ export class PetsController {
   @ApiOperation({ summary: 'Create a new pet' })
   create(@Body() createPetDto: CreatePetDto, @CurrentUser() user: any) {
     return this.petsService.create(createPetDto, user.id);
+  }
+
+  @Post(':id/photo')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Upload pet photo' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/pets',
+        filename: (_req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  uploadPhoto(
+    @Param('id') petId: string,
+    @CurrentUser() user: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Arquivo de foto nao enviado.');
+    }
+
+    const photoUrl = `/uploads/pets/${file.filename}`;
+    return this.petsService.uploadPhoto(petId, user.id, photoUrl);
   }
 
   @Get()
