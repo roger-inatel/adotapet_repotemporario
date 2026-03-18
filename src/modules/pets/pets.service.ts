@@ -94,7 +94,7 @@ export class PetsService {
     const pet = await this.ensurePetExists(id);
 
     if (pet.registeredById !== userId) {
-      throw new ForbiddenException('Você não tem permissão para alterar este pet.');
+      throw new ForbiddenException('Voce nao tem permissao para alterar este pet.');
     }
 
     return this.prisma.pet.update({
@@ -107,7 +107,7 @@ export class PetsService {
     const pet = await this.ensurePetExists(id);
 
     if (pet.registeredById !== userId) {
-      throw new ForbiddenException('Você não tem permissão para alterar este pet.');
+      throw new ForbiddenException('Voce nao tem permissao para alterar este pet.');
     }
 
     return this.prisma.pet.delete({
@@ -115,13 +115,22 @@ export class PetsService {
     });
   }
 
+  async uploadPhoto(petId: string, userId: string, photoUrl: string) {
+    const pet = await this.ensurePetExists(petId);
+
+    if (pet.registeredById !== userId) {
+      throw new ForbiddenException('Voce nao tem permissao para alterar este pet.');
+    }
+
+    return this.prisma.pet.update({
+      where: { id: petId },
+      data: { photoUrl },
+    });
+  }
+
   private async ensurePetExists(id: string) {
     const pet = await this.prisma.pet.findUnique({
       where: { id },
-      select: {
-        id: true,
-        registeredById: true,
-      },
     });
 
     if (!pet) {

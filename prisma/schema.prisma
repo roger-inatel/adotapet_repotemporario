@@ -122,6 +122,7 @@ model Pet {
   specialNeeds        Boolean   @default(false)
   specialNeedsDetails String?
   description         String?
+  photoUrl            String?
   status              PetStatus @default(AVAILABLE)
   city                String?
   state               String?
