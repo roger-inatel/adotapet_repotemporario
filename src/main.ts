@@ -18,6 +18,7 @@ async function bootstrap() {
     .setTitle('AdotaPet API')
     .setDescription('REST API documentation for AdotaPet backend')
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
