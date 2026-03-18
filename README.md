@@ -34,6 +34,12 @@ O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoç�
   - Denúncias
   - Pedidos de Resgate
   - Termos de Responsabilidade
+- Módulos implementados e ativos:
+  - Users
+  - Auth (JWT + bcrypt)
+  - Pets (com ownership e guards)
+  - Organizations
+  - Adoptions
 
 ## Getting Started
 
@@ -62,7 +68,7 @@ cp .env.example .env
 
 No Windows PowerShell:
 
-```bash
+```powershell
 Copy-Item .env.example .env
 ```
 
@@ -90,12 +96,39 @@ npm run start:dev
 
 A API estará disponível em `http://localhost:3000`.
 
+Se você abrir `http://localhost:3000`, verá apenas uma resposta de prova de vida da aplicação.
+
+## ?? Como usar a API (Frontend + Swagger)
+
+A documentação interativa da API fica em:
+
+?? `http://localhost:3000/docs`
+
+É no Swagger que Frontend e Backend alinham contrato de payloads, respostas e autenticação.
+
+### Fluxo recomendado para o Front testar rotas protegidas
+
+1. Criar usuário em `Users -> POST /users`
+2. Fazer login em `Auth -> POST /auth/login`
+3. Copiar o `access_token` retornado
+4. Clicar em **Authorize** no topo do Swagger
+5. Colar o token no formato:
+   - `Bearer SEU_TOKEN`
+6. Executar rotas protegidas (ex.: `POST /pets`, `PATCH /pets/:id`, `POST /adoptions`)
+
+### Importante
+
+- O backend identifica o usuário pelo token JWT.
+- Em rotas com ownership, o usuário só pode alterar os próprios recursos.
+- O Frontend **não precisa enviar `registeredById`** ao criar pet; esse campo é preenchido no backend.
+
 ## Scripts Úteis
 
 ```bash
 npm run build
 npm run lint
 npm run test
+npm run test:e2e
 npx prisma generate
 npx prisma studio
 ```
@@ -103,6 +136,8 @@ npx prisma studio
 ## Organização da Equipe
 
 - Backend: Roger e Rodrigo
+- Frontend: Lucas e Lilyan
+- DevOps: Breno
 - Gestão de tarefas: Trello (Sprints)
 
 ## Licença
