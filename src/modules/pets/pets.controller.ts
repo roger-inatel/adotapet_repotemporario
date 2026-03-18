@@ -7,9 +7,17 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PetSize, PetStatus, Sex, Species } from '@prisma/client';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { PetsService } from './pets.service';
@@ -20,6 +28,8 @@ export class PetsController {
   constructor(private readonly petsService: PetsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new pet' })
   create(@Body() createPetDto: CreatePetDto) {
     return this.petsService.create(createPetDto);
@@ -71,6 +81,8 @@ export class PetsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update pet by id' })
   @ApiParam({ name: 'id', description: 'Pet cuid id' })
   update(@Param('id') id: string, @Body() updatePetDto: UpdatePetDto) {
@@ -78,6 +90,8 @@ export class PetsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete pet by id' })
   @ApiParam({ name: 'id', description: 'Pet cuid id' })
   remove(@Param('id') id: string) {
