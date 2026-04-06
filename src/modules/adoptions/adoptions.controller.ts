@@ -15,10 +15,7 @@ export class AdoptionsController {
 
   @Post()
   @ApiOperation({ summary: 'Create an adoption request' })
-  create(
-    @Body() createAdoptionDto: CreateAdoptionDto,
-    @CurrentUser() user: any,
-  ) {
+  create(@Body() createAdoptionDto: CreateAdoptionDto, @CurrentUser() user: any) {
     return this.adoptionsService.create(createAdoptionDto, user.id);
   }
 

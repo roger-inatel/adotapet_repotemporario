@@ -11,12 +11,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ResponsibilityTermsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async signTerm(
-    adoptionRequestId: string,
-    user: { id: string },
-    ip: string,
-    userAgent: string,
-  ) {
+  async signTerm(adoptionRequestId: string, user: { id: string }, ip: string, userAgent: string) {
     const adoptionRequest = await this.prisma.adoptionRequest.findUnique({
       where: { id: adoptionRequestId },
       include: {
@@ -30,21 +25,15 @@ export class ResponsibilityTermsService {
     }
 
     if (adoptionRequest.requesterId !== user.id) {
-      throw new ForbiddenException(
-        'Apenas o adotante dono da solicitacao pode assinar o termo.',
-      );
+      throw new ForbiddenException('Apenas o adotante dono da solicitacao pode assinar o termo.');
     }
 
     if (adoptionRequest.status !== AdoptionRequestStatus.APPROVED) {
-      throw new BadRequestException(
-        'A solicitacao precisa estar aprovada para assinatura.',
-      );
+      throw new BadRequestException('A solicitacao precisa estar aprovada para assinatura.');
     }
 
     if (adoptionRequest.responsibilityTerm) {
-      throw new BadRequestException(
-        'Ja existe termo assinado para esta solicitacao.',
-      );
+      throw new BadRequestException('Ja existe termo assinado para esta solicitacao.');
     }
 
     const [term] = await this.prisma.$transaction([

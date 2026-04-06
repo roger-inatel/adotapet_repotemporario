@@ -14,10 +14,14 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
+    "test:report": "node scripts/generate-jest-html-report.js unit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:integration": "jest --config ./test/jest-integration.json",
+    "test:integration:report": "node scripts/generate-jest-html-report.js integration",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e:report": "node scripts/generate-jest-html-report.js e2e"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

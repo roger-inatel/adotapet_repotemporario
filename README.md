@@ -95,6 +95,12 @@ Antes de rodar `npm run test:e2e`, garanta:
 ```bash
 npm run build
 npm run lint
+<<<<<<< Updated upstream
+=======
+npm run test:report
+npm run test:integration:report
+npm run test:e2e:report
+>>>>>>> Stashed changes
 npx prisma generate
 npx prisma studio
 ```
