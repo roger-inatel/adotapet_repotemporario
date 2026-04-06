@@ -81,7 +81,7 @@ npm run test:e2e
 Os testes E2E usam `AppModule` real e acessam banco via Prisma.  
 Antes de rodar `npm run test:e2e`, garanta:
 
-- MySQL em execucao.
+- MySQL em execucao
 - `.env` configurado.
 - Migracoes aplicadas.
 
