@@ -11,9 +11,7 @@ describe('Controlador de autenticacao', () => {
       providers: [
         {
           provide: AuthService,
-          useValue: {
-            login: jest.fn(),
-          },
+          useValue: {}, // mock simples
         },
       ],
     }).compile();

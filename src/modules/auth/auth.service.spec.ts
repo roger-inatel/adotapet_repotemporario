@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe('Servico de autenticacao', () => {
   let service: AuthService;
@@ -12,15 +13,11 @@ describe('Servico de autenticacao', () => {
         AuthService,
         {
           provide: UsersService,
-          useValue: {
-            findByEmailForAuth: jest.fn(),
-          },
+          useValue: {},
         },
         {
           provide: JwtService,
-          useValue: {
-            signAsync: jest.fn(),
-          },
+          useValue: {},
         },
       ],
     }).compile();
