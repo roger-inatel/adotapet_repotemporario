@@ -118,8 +118,9 @@ A documentação interativa da API fica em:
 ```bash
 npm run build
 npm run lint
-npm run test
-npm run test:e2e
+npm run test:report
+npm run test:integration:report
+npm run test:e2e:report
 npx prisma generate
 npx prisma studio
 ```
