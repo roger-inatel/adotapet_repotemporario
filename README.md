@@ -1,106 +1,136 @@
-# AdotaPet Backend
+﻿# AdotaPet - API Backend
 
-API backend do projeto AdotaPet (S204 / INATEL), construida com NestJS, Prisma e MySQL.
+![NestJS](https://img.shields.io/badge/NestJS-11.x-E0234E?logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)
 
-## Stack
+Backend oficial do **AdotaPet**, uma solução digital para adoção consciente de animais.
 
-- NestJS 11
-- TypeScript
-- Prisma ORM
-- MySQL 8
-- Docker (para subir banco local)
+Projeto acadêmico da disciplina de construção de produtos digitais (**S204 / INATEL**).
 
-## Guia Rapido
+## Visão Geral
 
-### 1. Pre-requisitos
+O AdotaPet nasce com o objetivo de estruturar e centralizar o processo de adoção responsável, oferecendo uma base tecnológica para conectar pessoas, ONGs/abrigos e demandas de proteção animal.
 
-- Node.js LTS
-- Docker
+## Stack Tecnológico
 
-### 2. Instalar dependencias
+- **NestJS** (framework backend)
+- **TypeScript** (tipagem forte e organização)
+- **Prisma ORM** (acesso seguro ao banco)
+- **MySQL** (banco de dados relacional)
+- **Docker** (provisionamento local do banco)
+
+## Status Atual do Desenvolvimento
+
+- ✅ Setup inicial do backend concluído.
+- ✅ Prisma configurado e conectado ao MySQL via Docker.
+- ✅ Módulos Base: Pets, Usuários e ONGs implementados.
+- ✅ Segurança Avançada: Login (JWT + Bcrypt) e RBAC (Controle de Acesso por Papéis: ADMIN, NGO_ADMIN, ADOPTER).
+- ✅ Upload de Arquivos: Imagens de Pets via Multer (preparado para Docker Volumes).
+- ✅ Adoções & Termos: Fluxo completo de match, transações de aprovação e assinatura digital com rastro de auditoria (IP/User-Agent).
+- ⏳ Próximos passos: Sistema de Denúncias e Resgates (Upload de mídia e geolocalização).
+
+## Getting Started
+
+### 1. Pré-requisitos
+
+Antes de começar, garanta que você tenha instalado:
+
+- **Node.js** (LTS recomendado)
+- **Docker**
+
+### 2. Clone o repositório e instale dependências
 
 ```bash
+git clone <URL_DO_REPOSITORIO>
+cd adotapet-backend
 npm install
 ```
 
-### 3. Configurar ambiente
+### 3. Configure variáveis de ambiente
+
+Copie o arquivo de exemplo e ajuste os valores, se necessário:
+
+```bash
+cp .env.example .env
+```
+
+No Windows PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Variaveis esperadas:
+### 4. Suba o banco MySQL via Docker
 
-```env
-PORT=3000
-DATABASE_URL="mysql://root:root@localhost:3306/adotapet"
-JWT_SECRET="trocar_em_producao"
-```
-
-### 4. Subir MySQL local
+Use o comando abaixo exatamente como definido no projeto:
 
 ```bash
 docker run --name adotapet-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=adotapet -p 3306:3306 -d mysql:8.0
 ```
 
-### 5. Aplicar migracoes
+### 5. Execute as migrações do Prisma
+
+Com o banco em execução e `.env` configurado:
 
 ```bash
 npx prisma migrate dev
 ```
 
-### 6. Rodar API
+### 6. Inicie o servidor em desenvolvimento
 
 ```bash
 npm run start:dev
 ```
 
-API: `http://localhost:3000`  
-Swagger: `http://localhost:3000/docs`
+A API estará disponível em `http://localhost:3000`.
 
-## Como Rodar os Testes
+Se você abrir `http://localhost:3000`, verá apenas uma resposta de prova de vida da aplicação.
 
-### Comandos
+## ?? Como usar a API (Frontend + Swagger)
 
-```bash
-npm run test
-npm run test:watch
-npm run test:cov
-npm run test:e2e
-```
+A documentação interativa da API fica em:
 
-### O que cada um faz
+?? `http://localhost:3000/docs`
 
-- `npm run test`: roda todos os `*.spec.ts` dentro de `src` (testes unitarios).
-- `npm run test:watch`: modo observacao para desenvolvimento.
-- `npm run test:cov`: igual ao `test`, mas gera cobertura em `coverage/`.
-- `npm run test:e2e`: roda os arquivos `*.e2e-spec.ts` na pasta `test`.
+É no Swagger que Frontend e Backend alinham contrato de payloads, respostas e autenticação.
 
-### Pre-requisito para E2E
+### Fluxo recomendado para o Front testar rotas protegidas
 
-Os testes E2E usam `AppModule` real e acessam banco via Prisma.  
-Antes de rodar `npm run test:e2e`, garanta:
+1. Criar usuário em `Users -> POST /users`
+2. Fazer login em `Auth -> POST /auth/login`
+3. Copiar o `access_token` retornado
+4. Clicar em **Authorize** no topo do Swagger
+5. Colar o token no formato:
+   - `Bearer SEU_TOKEN`
+6. Executar rotas protegidas (ex.: `POST /pets`, `PATCH /pets/:id`, `POST /adoptions`)
 
-- MySQL em execucao
-- `.env` configurado.
-- Migracoes aplicadas.
+### Importante
 
-## Estado Atual dos Testes (verificado localmente)
+- O backend identifica o usuário pelo token JWT.
+- Em rotas com ownership, o usuário só pode alterar os próprios recursos.
+- O Frontend **não precisa enviar `registeredById`** ao criar pet; esse campo é preenchido no backend.
 
-- `npm run test:e2e`: passando.
-- `npm run test`: falhando em specs de `auth` por dependencias do Nest nao mockadas (`AuthService` e `UsersService` nos modulos de teste).
-
-## Scripts Uteis
+## Scripts Úteis
 
 ```bash
 npm run build
 npm run lint
-<<<<<<< Updated upstream
-=======
-npm run test:report
-npm run test:integration:report
-npm run test:e2e:report
->>>>>>> Stashed changes
+npm run test
+npm run test:e2e
 npx prisma generate
 npx prisma studio
 ```
+
+## Organização da Equipe
+
+- Backend: Roger e Rodrigo
+- Frontend: Lucas e Lilyan
+- DevOps: Breno
+- Gestão de tarefas: Trello (Sprints)
+
+## Licença
+
+Projeto acadêmico para fins educacionais.
