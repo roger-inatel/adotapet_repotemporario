@@ -4,7 +4,12 @@ on:
   push:
     branches:
       - main
+      - pipeline-update
   pull_request:
+    branches:
+      - main
+      - pipeline-update
+
 
 jobs:
   e2e:
