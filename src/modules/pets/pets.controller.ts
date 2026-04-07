@@ -134,11 +134,7 @@ export class PetsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update pet by id' })
   @ApiParam({ name: 'id', description: 'Pet cuid id' })
-  update(
-    @Param('id') id: string,
-    @Body() updatePetDto: UpdatePetDto,
-    @CurrentUser() user: any,
-  ) {
+  update(@Param('id') id: string, @Body() updatePetDto: UpdatePetDto, @CurrentUser() user: any) {
     return this.petsService.update(id, updatePetDto, user.id);
   }
 

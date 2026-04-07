@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -35,9 +31,7 @@ export class OrganizationsService {
     });
 
     if (!organization) {
-      throw new NotFoundException(
-        `Organization with id "${id}" was not found.`,
-      );
+      throw new NotFoundException(`Organization with id "${id}" was not found.`);
     }
 
     return organization;
@@ -72,17 +66,12 @@ export class OrganizationsService {
     });
 
     if (!organization) {
-      throw new NotFoundException(
-        `Organization with id "${id}" was not found.`,
-      );
+      throw new NotFoundException(`Organization with id "${id}" was not found.`);
     }
   }
 
   private handleUniqueConstraint(error: unknown) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       const target = Array.isArray(error.meta?.target)
         ? error.meta.target.join(', ')
         : String(error.meta?.target ?? '');
@@ -95,9 +84,7 @@ export class OrganizationsService {
         throw new BadRequestException('CNPJ is already in use.');
       }
 
-      throw new BadRequestException(
-        'Unique field already exists for organization.',
-      );
+      throw new BadRequestException('Unique field already exists for organization.');
     }
   }
 }

@@ -4,10 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  AdoptionRequestStatus,
-  PetStatus,
-} from '@prisma/client';
+import { AdoptionRequestStatus, PetStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateAdoptionDto } from './dto/create-adoption.dto';
 import { UpdateAdoptionStatusDto } from './dto/update-adoption-status.dto';
@@ -60,11 +57,7 @@ export class AdoptionsService {
     });
   }
 
-  async updateStatus(
-    adoptionId: string,
-    updateDto: UpdateAdoptionStatusDto,
-    userId: string,
-  ) {
+  async updateStatus(adoptionId: string, updateDto: UpdateAdoptionStatusDto, userId: string) {
     const adoption = await this.prisma.adoptionRequest.findUnique({
       where: { id: adoptionId },
       include: {
@@ -79,9 +72,7 @@ export class AdoptionsService {
     }
 
     if (adoption.pet.registeredById !== userId) {
-      throw new ForbiddenException(
-        'Você não tem permissão para alterar esta solicitação.',
-      );
+      throw new ForbiddenException('Você não tem permissão para alterar esta solicitação.');
     }
 
     if (updateDto.status === AdoptionRequestStatus.APPROVED) {

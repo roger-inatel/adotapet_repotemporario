@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 
-describe('Adoption Flow (e2e)', () => {
+describe('Fluxo de adocao (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
@@ -26,7 +26,7 @@ describe('Adoption Flow (e2e)', () => {
     await app.init();
   });
 
-  it('1) should create a test user', async () => {
+  it('1) deve criar um usuario de teste', async () => {
     const response = await request(app.getHttpServer()).post('/users').send({
       fullName: 'Usuario Teste E2E',
       email,
@@ -39,7 +39,7 @@ describe('Adoption Flow (e2e)', () => {
     userId = response.body.id;
   });
 
-  it('2) should login and return a jwt token', async () => {
+  it('2) deve fazer login e retornar um token JWT', async () => {
     const response = await request(app.getHttpServer()).post('/auth/login').send({
       email,
       password,
@@ -50,7 +50,7 @@ describe('Adoption Flow (e2e)', () => {
     jwtToken = response.body.access_token;
   });
 
-  it('3) should create a pet using bearer token', async () => {
+  it('3) deve criar um pet usando Bearer token', async () => {
     const response = await request(app.getHttpServer())
       .post('/pets')
       .set('Authorization', `Bearer ${jwtToken}`)
