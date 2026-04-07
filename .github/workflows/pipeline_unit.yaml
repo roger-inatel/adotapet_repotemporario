@@ -1,0 +1,49 @@
+name: pipeline_back
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      #baixa o codigo do repositório
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      #Define a versao Node
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      #Cache (acelera MUITO o pipeline)
+      - name: Cache dependências
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      #Instala dependencias
+      - name: Instalar dependências
+        run: npm ci
+
+      #Gera cliente do Prisma
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+
+      #Build
+      - name: Build
+        run: npm run build
+
+      #Testes
+      - name: Testes
+        run: npm run test:cov
