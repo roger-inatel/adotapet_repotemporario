@@ -10,10 +10,30 @@ on:
       - main
       - pipeline-update
 
-
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "mysql://root:root@localhost:3306/test"
+
   e2e:
     runs-on: ubuntu-latest
+    needs: setup   # 👈 só roda depois do setup
 
     services:
       mysql:
@@ -30,33 +50,27 @@ jobs:
           --health-retries=5
 
     steps:
-      #Clona o repositório
       - name: Clonar repositório
         uses: actions/checkout@v4
 
-      #Node.js
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      #Instala dependências
       - name: Instalar dependências
         run: npm ci
 
-      #Cliente prisma 
       - name: Prisma generate
         run: npx prisma generate
         env:
           DATABASE_URL: "mysql://root:root@localhost:3306/test"
 
-      #Rodar migrations
       - name: Migrate
         run: npx prisma migrate deploy
         env:
           DATABASE_URL: "mysql://root:root@localhost:3306/test"
 
-      #Rodar testes E2E
       - name: Rodar E2E
         run: npm run test:e2e
         env:
