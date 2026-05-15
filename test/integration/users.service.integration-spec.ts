@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../src/prisma/prisma.service';
@@ -53,5 +54,41 @@ describe('UsersService (integration)', () => {
     expect(result).not.toHaveProperty('password');
     expect(persistedUser.password).not.toBe('Senha@123');
     await expect(bcrypt.compare('Senha@123', persistedUser.password)).resolves.toBe(true);
+  });
+
+  it('deve impedir email duplicado usando restricao real do banco', async () => {
+    await service.create({
+      fullName: 'Usuario Integracao',
+      email,
+      password: 'Senha@123',
+      role: 'ADOPTER',
+    });
+
+    await expect(
+      service.create({
+        fullName: 'Usuario Duplicado',
+        email,
+        password: 'Outra@123',
+        role: 'ADOPTER',
+      }),
+    ).rejects.toThrow(new BadRequestException('Email is already in use.'));
+  });
+
+  it('deve atualizar senha persistindo um novo hash no banco', async () => {
+    const createdUser = await service.create({
+      fullName: 'Usuario Integracao',
+      email,
+      password: 'Senha@123',
+      role: 'ADOPTER',
+    });
+
+    await service.update(createdUser.id, { password: 'Nova@Senha123' });
+    const persistedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: createdUser.id },
+    });
+
+    expect(persistedUser.password).not.toBe('Nova@Senha123');
+    await expect(bcrypt.compare('Nova@Senha123', persistedUser.password)).resolves.toBe(true);
+    await expect(bcrypt.compare('Senha@123', persistedUser.password)).resolves.toBe(false);
   });
 });

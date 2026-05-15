@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AdoptionRequestStatus, PetStatus } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -125,6 +125,58 @@ describe('ResponsibilityTermsService', () => {
     ).rejects.toThrow(
       new BadRequestException('A solicitacao precisa estar aprovada para assinatura.'),
     );
+
+    expect(prismaMock.responsibilityTerm.create).not.toHaveBeenCalled();
+    expect(prismaMock.pet.update).not.toHaveBeenCalled();
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('deve retornar 404 ao assinar termo de solicitacao inexistente', async () => {
+    prismaMock.adoptionRequest.findUnique.mockResolvedValue(null);
+
+    await expect(
+      service.signTerm('adocao-inexistente', { id: 'user-1' }, '127.0.0.1', 'jest'),
+    ).rejects.toThrow(new NotFoundException('Solicitacao de adocao nao encontrada.'));
+
+    expect(prismaMock.responsibilityTerm.create).not.toHaveBeenCalled();
+    expect(prismaMock.pet.update).not.toHaveBeenCalled();
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('deve impedir assinatura por usuario diferente do solicitante', async () => {
+    prismaMock.adoptionRequest.findUnique.mockResolvedValue({
+      id: 'adocao-4',
+      requesterId: 'user-solicitante',
+      petId: 'pet-4',
+      status: AdoptionRequestStatus.APPROVED,
+      responsibilityTerm: null,
+      pet: { id: 'pet-4' },
+    });
+
+    await expect(
+      service.signTerm('adocao-4', { id: 'user-outro' }, '127.0.0.1', 'jest'),
+    ).rejects.toThrow(
+      new ForbiddenException('Apenas o adotante dono da solicitacao pode assinar o termo.'),
+    );
+
+    expect(prismaMock.responsibilityTerm.create).not.toHaveBeenCalled();
+    expect(prismaMock.pet.update).not.toHaveBeenCalled();
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('deve impedir assinatura duplicada do termo', async () => {
+    prismaMock.adoptionRequest.findUnique.mockResolvedValue({
+      id: 'adocao-5',
+      requesterId: 'user-5',
+      petId: 'pet-5',
+      status: AdoptionRequestStatus.APPROVED,
+      responsibilityTerm: { id: 'term-existente' },
+      pet: { id: 'pet-5' },
+    });
+
+    await expect(
+      service.signTerm('adocao-5', { id: 'user-5' }, '127.0.0.1', 'jest'),
+    ).rejects.toThrow(new BadRequestException('Ja existe termo assinado para esta solicitacao.'));
 
     expect(prismaMock.responsibilityTerm.create).not.toHaveBeenCalled();
     expect(prismaMock.pet.update).not.toHaveBeenCalled();

@@ -1,4 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -14,7 +15,9 @@ describe('UsersService', () => {
   const prismaMock = {
     user: {
       create: jest.fn(),
+      findMany: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
       delete: jest.fn(),
     },
   };
@@ -80,6 +83,91 @@ describe('UsersService', () => {
       expect.objectContaining({
         data: expect.objectContaining({
           password: 'Senha@123',
+        }),
+      }),
+    );
+  });
+
+  it('deve retornar erro ao criar usuario com email ja existente', async () => {
+    (bcrypt.hash as jest.Mock).mockResolvedValue('senha-hash');
+    prismaMock.user.create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
+        code: 'P2002',
+        clientVersion: 'test',
+        meta: { target: ['email'] },
+      }),
+    );
+
+    await expect(
+      service.create({
+        fullName: 'Usuario Teste',
+        email: 'usuario@teste.com',
+        password: 'Senha@123',
+      }),
+    ).rejects.toThrow(new BadRequestException('Email is already in use.'));
+  });
+
+  it('deve atualizar senha usando hash e nao salvar a senha pura', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: 'user-1' });
+    (bcrypt.hash as jest.Mock).mockResolvedValue('nova-senha-hash');
+    prismaMock.user.update.mockResolvedValue({
+      id: 'user-1',
+      fullName: 'Usuario Teste',
+      email: 'usuario@teste.com',
+      role: 'ADOPTER',
+      isActive: true,
+    });
+
+    await service.update('user-1', { password: 'Nova@Senha123' });
+
+    expect(bcrypt.hash).toHaveBeenCalledWith('Nova@Senha123', 10);
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'user-1' },
+        data: expect.objectContaining({
+          password: 'nova-senha-hash',
+        }),
+      }),
+    );
+    expect(prismaMock.user.update).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          password: 'Nova@Senha123',
+        }),
+      }),
+    );
+  });
+
+  it('deve listar usuarios sem selecionar password', async () => {
+    prismaMock.user.findMany.mockResolvedValue([]);
+
+    await service.findAll();
+
+    expect(prismaMock.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.not.objectContaining({
+          password: true,
+        }),
+      }),
+    );
+  });
+
+  it('deve buscar usuario por id sem selecionar password', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 'user-1',
+      fullName: 'Usuario Teste',
+      email: 'usuario@teste.com',
+      role: 'ADOPTER',
+      isActive: true,
+    });
+
+    await service.findOne('user-1');
+
+    expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'user-1' },
+        select: expect.not.objectContaining({
+          password: true,
         }),
       }),
     );

@@ -1,10 +1,11 @@
-import { ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdoptionRequestStatus, PetSize, PetStatus, Sex, Species } from '@prisma/client';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { AdoptionsService } from '../../src/modules/adoptions/adoptions.service';
 import { OrganizationsService } from '../../src/modules/organizations/organizations.service';
 import { PetsService } from '../../src/modules/pets/pets.service';
+import { ResponsibilityTermsService } from '../../src/modules/responsibility-terms/responsibility-terms.service';
 
 describe('Core services (integration)', () => {
   let module: TestingModule;
@@ -12,18 +13,26 @@ describe('Core services (integration)', () => {
   let adoptionsService: AdoptionsService;
   let organizationsService: OrganizationsService;
   let petsService: PetsService;
+  let responsibilityTermsService: ResponsibilityTermsService;
 
   const runId = Date.now().toString();
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      providers: [AdoptionsService, OrganizationsService, PetsService, PrismaService],
+      providers: [
+        AdoptionsService,
+        OrganizationsService,
+        PetsService,
+        ResponsibilityTermsService,
+        PrismaService,
+      ],
     }).compile();
 
     prisma = module.get(PrismaService);
     adoptionsService = module.get(AdoptionsService);
     organizationsService = module.get(OrganizationsService);
     petsService = module.get(PetsService);
+    responsibilityTermsService = module.get(ResponsibilityTermsService);
     await prisma.$connect();
   });
 
@@ -68,6 +77,54 @@ describe('Core services (integration)', () => {
         tradeName: 'ONG Atualizada',
         city: 'Pouso Alegre',
         isVerified: true,
+      }),
+    );
+  });
+
+  it('deve impedir organizacao com CNPJ duplicado usando restricao real do banco', async () => {
+    const cnpj = `${runId.slice(-8).padStart(8, '0')}000199`;
+
+    await organizationsService.create({
+      legalName: 'ONG Integracao Original',
+      email: `org-original-${runId}@adotapet.test`,
+      cnpj,
+    });
+
+    await expect(
+      organizationsService.create({
+        legalName: 'ONG Integracao Duplicada',
+        email: `org-duplicada-${runId}@adotapet.test`,
+        cnpj,
+      }),
+    ).rejects.toThrow(new BadRequestException('CNPJ is already in use.'));
+  });
+
+  it('deve criar pet pelo service e persistir o vinculo com o usuario dono', async () => {
+    const owner = await createUser('pet-create-owner');
+
+    const result = await petsService.create(
+      {
+        name: 'Pet Criado Pelo Service',
+        species: Species.CAT,
+        sex: Sex.FEMALE,
+        ageInMonths: 12,
+        size: PetSize.SMALL,
+        status: PetStatus.AVAILABLE,
+        city: 'Santa Rita do Sapucai',
+        state: 'MG',
+      },
+      owner.id,
+    );
+    const persistedPet = await prisma.pet.findUniqueOrThrow({
+      where: { id: result.id },
+    });
+
+    expect(result.registeredById).toBe(owner.id);
+    expect(persistedPet).toEqual(
+      expect.objectContaining({
+        id: result.id,
+        name: 'Pet Criado Pelo Service',
+        registeredById: owner.id,
       }),
     );
   });
@@ -175,6 +232,88 @@ describe('Core services (integration)', () => {
 
     expect(result.status).toBe(AdoptionRequestStatus.APPROVED);
     expect(persistedPet.status).toBe(PetStatus.PENDING_ADOPTION);
+  });
+
+  it('deve criar solicitacao de adocao persistindo relacionamento com pet e solicitante', async () => {
+    const owner = await createUser('adoption-create-owner');
+    const requester = await createUser('adoption-create-requester');
+    const pet = await prisma.pet.create({
+      data: buildPetData(owner.id, {
+        name: 'Pet Relacionamento Adocao Integracao',
+        status: PetStatus.AVAILABLE,
+      }),
+    });
+
+    const result = await adoptionsService.create(
+      {
+        petId: pet.id,
+        message: 'Tenho estrutura para adotar.',
+      },
+      requester.id,
+    );
+    const persistedAdoption = await prisma.adoptionRequest.findUniqueOrThrow({
+      where: { id: result.id },
+      include: { pet: true, requester: true },
+    });
+
+    expect(persistedAdoption).toEqual(
+      expect.objectContaining({
+        id: result.id,
+        petId: pet.id,
+        requesterId: requester.id,
+        status: AdoptionRequestStatus.PENDING,
+        message: 'Tenho estrutura para adotar.',
+      }),
+    );
+    expect(persistedAdoption.pet.registeredById).toBe(owner.id);
+    expect(persistedAdoption.requester.email).toBe(requester.email);
+  });
+
+  it('deve assinar termo aprovado e persistir termo e pet como ADOPTED', async () => {
+    const owner = await createUser('term-owner');
+    const requester = await createUser('term-requester');
+    const pet = await prisma.pet.create({
+      data: buildPetData(owner.id, {
+        name: 'Pet Termo Integracao',
+        status: PetStatus.AVAILABLE,
+      }),
+    });
+    const adoption = await adoptionsService.create(
+      {
+        petId: pet.id,
+        message: 'Estou pronto para adotar.',
+      },
+      requester.id,
+    );
+
+    await adoptionsService.updateStatus(
+      adoption.id,
+      { status: AdoptionRequestStatus.APPROVED },
+      owner.id,
+    );
+    const result = await responsibilityTermsService.signTerm(
+      adoption.id,
+      { id: requester.id },
+      '127.0.0.1',
+      'jest-integration',
+    );
+    const persistedTerm = await prisma.responsibilityTerm.findUniqueOrThrow({
+      where: { adoptionRequestId: adoption.id },
+    });
+    const persistedPet = await prisma.pet.findUniqueOrThrow({
+      where: { id: pet.id },
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: persistedTerm.id,
+        adoptionRequestId: adoption.id,
+        adopterIp: '127.0.0.1',
+        userAgent: 'jest-integration',
+      }),
+    );
+    expect(persistedTerm.adoptionRequestId).toBe(adoption.id);
+    expect(persistedPet.status).toBe(PetStatus.ADOPTED);
   });
 
   it('deve impedir criar solicitacao de adocao para pet indisponivel', async () => {
